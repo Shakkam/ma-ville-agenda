@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -15,16 +15,11 @@ model User {
   id        String     @id @default(cuid())
   email     String     @unique
   password  String     // bcrypt hashed
-  role      UserRole   @default(SUPER_ADMIN)
+  role      String     @default("SUPER_ADMIN")
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
 
   events Event[]
-}
-
-enum UserRole {
-  SUPER_ADMIN
-  MODERATOR
 }
 
 // Event model
@@ -35,10 +30,10 @@ model Event {
   imageUrl    String?
   startDate   DateTime
   endDate     DateTime
-  category    EventCategory
+  category    String
   location    String
   externalUrl String?
-  status      EventStatus   @default(DRAFT)
+  status      String        @default("DRAFT")
   createdBy   String        // User ID
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
@@ -48,20 +43,4 @@ model Event {
   @@index([status])
   @@index([category])
   @@index([startDate])
-}
-
-enum EventCategory {
-  CULTURE
-  SPORT
-  ANIMATION
-  COMMERCE
-  AUTRE
-}
-
-enum EventStatus {
-  DRAFT
-  PENDING
-  PUBLISHED
-  REJECTED
-  ARCHIVED
 }
