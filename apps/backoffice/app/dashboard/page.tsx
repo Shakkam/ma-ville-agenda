@@ -4,13 +4,15 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '@/lib/store/authStore';
-import { useEventStore } from '@/lib/store/eventStore';
+import { eventApi } from '@/lib/api/client';
+import type { Event } from '@/lib/types';
 
 export default function DashboardPage() {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(false);
   const { isAuthenticated, logout } = useAuthStore();
-  const { pendingEvents, publishedEvents, loading, fetchAll } = useEventStore();
 
   useEffect(() => {
     setMounted(true);
@@ -22,12 +24,28 @@ export default function DashboardPage() {
       router.push('/login');
       return;
     }
-    fetchAll();
-  }, [mounted, isAuthenticated, router, fetchAll]);
+
+    const fetchEvents = async () => {
+      setLoading(true);
+      try {
+        const data = await eventApi.getAll();
+        setEvents(data);
+      } catch (error) {
+        console.error('Failed to fetch events:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEvents();
+  }, [mounted, isAuthenticated, router]);
 
   if (!mounted || !isAuthenticated) {
     return <div style={{ padding: '20px' }}>Chargement...</div>;
   }
+
+  const pendingEvents = events.filter((e) => e.status === 'PENDING');
+  const publishedEvents = events.filter((e) => e.status === 'PUBLISHED');
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#f8f9fa' }}>
@@ -84,41 +102,20 @@ export default function DashboardPage() {
               padding: '24px',
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
             }}>
-              <h2 style={{ marginTop: 0 }}>⏳ En attente de validation ({pendingEvents.length})</h2>
+              <h2 style={{ marginTop: 0 }}>⏳ En attente ({pendingEvents.length})</h2>
               {loading ? (
                 <p>Chargement...</p>
               ) : pendingEvents.length === 0 ? (
-                <p style={{ color: '#757575', fontStyle: 'italic' }}>Aucun événement en attente</p>
+                <p style={{ color: '#757575', fontStyle: 'italic' }}>✅ Aucun événement en attente</p>
               ) : (
                 <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
                   {pendingEvents.map((event) => (
                     <li key={event.id}>
-                      <div style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        padding: '12px',
-                        border: '1px solid #e0e0e0',
-                        borderRadius: '6px',
-                      }}>
-                        <div>
-                          <h3 style={{ margin: '0 0 4px 0', fontSize: '16px' }}>{event.title}</h3>
-                          <p style={{ margin: 0, fontSize: '12px', color: '#757575' }}>
-                            {new Date(event.startDate).toLocaleDateString('fr-FR')}
-                          </p>
-                        </div>
-                        <Link href={`/dashboard/validate/${event.id}`} style={{
-                          display: 'inline-block',
-                          backgroundColor: '#4caf50',
-                          color: 'white',
-                          padding: '6px 12px',
-                          borderRadius: '4px',
-                          fontSize: '12px',
-                          textDecoration: 'none',
-                          fontWeight: '500',
-                        }}>
-                          Voir détails
-                        </Link>
+                      <div style={{ padding: '12px', border: '1px solid #e0e0e0', borderRadius: '6px' }}>
+                        <h3 style={{ margin: '0 0 4px 0', fontSize: '16px' }}>{event.title}</h3>
+                        <p style={{ margin: 0, fontSize: '12px', color: '#757575' }}>
+                          {new Date(event.startDate).toLocaleDateString('fr-FR')}
+                        </p>
                       </div>
                     </li>
                   ))}
@@ -134,43 +131,21 @@ export default function DashboardPage() {
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
             }}>
               <h2 style={{ marginTop: 0 }}>✅ Publiés ({publishedEvents.length})</h2>
-              {loading ? (
-                <p>Chargement...</p>
-              ) : publishedEvents.length === 0 ? (
+              {publishedEvents.length === 0 ? (
                 <p style={{ color: '#757575', fontStyle: 'italic' }}>Aucun événement publié</p>
               ) : (
                 <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  {publishedEvents.slice(0, 5).map((event) => (
+                  {publishedEvents.map((event) => (
                     <li key={event.id}>
-                      <div style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        padding: '12px',
-                        border: '1px solid #e0e0e0',
-                        borderRadius: '6px',
-                      }}>
-                        <div>
-                          <h3 style={{ margin: '0 0 4px 0', fontSize: '16px' }}>{event.title}</h3>
-                          <p style={{ margin: 0, fontSize: '12px', color: '#757575' }}>
-                            {new Date(event.startDate).toLocaleDateString('fr-FR')}
-                          </p>
-                        </div>
+                      <div style={{ padding: '12px', border: '1px solid #e0e0e0', borderRadius: '6px' }}>
+                        <h3 style={{ margin: '0 0 4px 0', fontSize: '16px' }}>{event.title}</h3>
+                        <p style={{ margin: 0, fontSize: '12px', color: '#757575' }}>
+                          📅 {new Date(event.startDate).toLocaleDateString('fr-FR')} | 📍 {event.location}
+                        </p>
                       </div>
                     </li>
                   ))}
                 </ul>
-              )}
-              {publishedEvents.length > 5 && (
-                <Link href="/dashboard/events" style={{
-                  display: 'inline-block',
-                  marginTop: '16px',
-                  color: '#2d93c4',
-                  textDecoration: 'none',
-                  fontWeight: '500',
-                }}>
-                  Voir tous les événements →
-                </Link>
               )}
             </section>
           </div>
