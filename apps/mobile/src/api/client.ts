@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { Event, FilterOptions } from '../types/index.js';
+import type { Event, FilterOptions } from '../types/index';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000/api';
 

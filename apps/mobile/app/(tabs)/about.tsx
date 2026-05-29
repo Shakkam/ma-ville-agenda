@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { colors, spacing, typography } from '@/styles/colors.js';
+import { colors, spacing, typography } from '@/styles/colors';
 
 export default function AboutScreen() {
   return (
@@ -19,11 +19,6 @@ export default function AboutScreen() {
 
         <Text style={styles.section}>Développé par</Text>
         <Text style={styles.text}>Équipe citoyenne de Léognan</Text>
-
-        <Text style={styles.section}>Source</Text>
-        <Text style={styles.text}>
-          https://github.com/Shakkam/ma-ville-agenda
-        </Text>
 
         <Text style={styles.section}>Licence</Text>
         <Text style={styles.text}>MIT</Text>

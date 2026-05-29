@@ -10,9 +10,9 @@ import {
   Linking,
 } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
-import { eventApi } from '@/api/client.js';
-import { colors, spacing, typography } from '@/styles/colors.js';
-import type { Event } from '@/types/index.js';
+import { eventApi } from '@/api/client';
+import { colors, spacing, typography } from '@/styles/colors';
+import type { Event } from '@/types/index';
 
 export default function EventDetailScreen() {
   const { id } = useLocalSearchParams();

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
-import type { Event, EventCategory, FilterOptions } from '../types/index.js';
-import { eventApi } from '../api/client.js';
+import type { Event, EventCategory, FilterOptions } from '../types/index';
+import { eventApi } from '../api/client';
 
 interface EventState {
   events: Event[];

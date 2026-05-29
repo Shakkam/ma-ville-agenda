@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 import { View, FlatList, StyleSheet, ActivityIndicator, Text } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useEventStore } from '@/store/eventStore.js';
-import { EventCard } from '@/components/EventCard.js';
-import { CategoryFilter } from '@/components/CategoryFilter.js';
-import { colors, spacing } from '@/styles/colors.js';
-import type { Event } from '@/types/index.js';
+import { useEventStore } from '@/store/eventStore';
+import { EventCard } from '@/components/EventCard';
+import { CategoryFilter } from '@/components/CategoryFilter';
+import { colors, spacing } from '@/styles/colors';
+import type { Event } from '@/types/index';
 
 export default function EventsScreen() {
   const router = useRouter();

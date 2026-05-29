@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, ScrollView, TouchableOpacity, Text, StyleSheet } from 'react-native';
-import { colors, spacing, typography } from '../styles/colors.js';
-import type { EventCategory } from '../types/index.js';
+import { colors, spacing, typography } from '../styles/colors';
+import type { EventCategory } from '../types/index';
 
 type Category = EventCategory | null;
 
