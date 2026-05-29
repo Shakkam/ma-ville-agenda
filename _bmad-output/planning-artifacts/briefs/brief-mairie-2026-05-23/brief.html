@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ma Ville Agenda — Product Brief</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 10.5pt;
+    line-height: 1.65;
+    color: #1a1a2e;
+    background: #fff;
+    padding: 0;
+  }
+
+  .cover {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
+    color: white;
+    padding: 72px 64px 60px;
+    min-height: 220px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cover::after {
+    content: '';
+    position: absolute;
+    right: -60px;
+    top: -60px;
+    width: 320px;
+    height: 320px;
+    border-radius: 50%;
+    background: rgba(229, 57, 53, 0.12);
+  }
+
+  .cover-label {
+    font-size: 8pt;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.55);
+    margin-bottom: 18px;
+  }
+
+  .cover h1 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 32pt;
+    font-weight: 700;
+    line-height: 1.15;
+    margin-bottom: 10px;
+    color: #fff;
+  }
+
+  .cover-sub {
+    font-size: 11pt;
+    color: rgba(255,255,255,0.7);
+    font-weight: 300;
+    margin-bottom: 32px;
+  }
+
+  .cover-meta {
+    display: flex;
+    gap: 28px;
+    font-size: 8.5pt;
+    color: rgba(255,255,255,0.5);
+    font-weight: 400;
+  }
+
+  .cover-meta span { display: flex; align-items: center; gap: 6px; }
+
+  .status-pill {
+    display: inline-block;
+    background: #e53935;
+    color: white;
+    font-size: 7.5pt;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-left: 6px;
+  }
+
+  .content {
+    padding: 48px 64px 64px;
+    max-width: 720px;
+  }
+
+  h2 {
+    font-size: 13pt;
+    font-weight: 700;
+    color: #0f3460;
+    margin: 36px 0 12px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid #e8edf5;
+    letter-spacing: -0.01em;
+  }
+
+  h3 {
+    font-size: 9.5pt;
+    font-weight: 600;
+    color: #1a1a2e;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 22px 0 8px;
+  }
+
+  p { margin-bottom: 12px; color: #2d2d44; }
+
+  ul { margin: 8px 0 12px 0; padding-left: 0; list-style: none; }
+
+  ul li {
+    padding: 5px 0 5px 20px;
+    position: relative;
+    color: #2d2d44;
+  }
+
+  ul li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: #e53935;
+    font-weight: 600;
+  }
+
+  strong { color: #1a1a2e; font-weight: 600; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0 20px;
+    font-size: 9.5pt;
+  }
+
+  th {
+    background: #0f3460;
+    color: white;
+    font-weight: 600;
+    text-align: left;
+    padding: 9px 14px;
+    font-size: 8.5pt;
+    letter-spacing: 0.04em;
+  }
+
+  td {
+    padding: 8px 14px;
+    border-bottom: 1px solid #e8edf5;
+    color: #2d2d44;
+  }
+
+  tr:nth-child(even) td { background: #f7f9fc; }
+
+  .callout {
+    background: linear-gradient(135deg, #f0f4ff, #e8f0fe);
+    border-left: 4px solid #0f3460;
+    padding: 14px 18px;
+    margin: 16px 0;
+    border-radius: 0 6px 6px 0;
+  }
+
+  .callout strong { color: #0f3460; }
+
+  .version-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin: 12px 0 20px;
+  }
+
+  .version-card {
+    border: 1px solid #e0e7f0;
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+
+  .version-card.mvp { border-top: 3px solid #e53935; }
+  .version-card.v2  { border-top: 3px solid #0f3460; }
+  .version-card.v3  { border-top: 3px solid #43a047; }
+
+  .version-card h4 {
+    font-size: 8.5pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+    color: #1a1a2e;
+  }
+
+  .version-card ul { margin: 0; }
+  .version-card ul li { font-size: 9pt; padding: 3px 0 3px 16px; }
+
+  .exclu { color: #aaa !important; }
+  .exclu::before { color: #ddd !important; content: '×' !important; }
+
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin: 12px 0 20px;
+  }
+
+  .metric-card {
+    background: #f7f9fc;
+    border-radius: 8px;
+    padding: 12px 14px;
+    border: 1px solid #e0e7f0;
+  }
+
+  .metric-card .label {
+    font-size: 8pt;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #888;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .metric-card .value {
+    font-size: 11pt;
+    font-weight: 700;
+    color: #0f3460;
+  }
+
+  .vision-box {
+    background: linear-gradient(135deg, #1a1a2e 0%, #0f3460 100%);
+    color: white;
+    border-radius: 10px;
+    padding: 24px 28px;
+    margin: 16px 0;
+  }
+
+  .vision-box p { color: rgba(255,255,255,0.85); margin: 0; }
+
+  @media print {
+    body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+    .cover { break-after: avoid; }
+    h2 { break-after: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <div class="cover-label">Product Brief <span class="status-pill">Final</span></div>
+  <h1>Ma Ville Agenda</h1>
+  <div class="cover-sub">L'agenda citoyen de Léognan — et demain, de toute commune qui le veut.</div>
+  <div class="cover-meta">
+    <span>23 mai 2026</span>
+    <span>Équipe citoyenne · Léognan</span>
+  </div>
+</div>
+
+<div class="content">
+
+<h2>Résumé exécutif</h2>
+
+<p>Léognan est une commune active, mais ses habitants ne savent pas ce qui s'y passe. La communication municipale est défaillante : événements culturels, sportifs, commerciaux et associatifs sont éparpillés, peu visibles, et souvent ignorés faute d'un point de centralisation. <strong>Ma Ville Agenda</strong> comble ce vide — une application mobile (iOS et Android) qui agrège et présente l'agenda complet de la commune, consultable en quelques secondes par n'importe quel habitant.</p>
+
+<p>Portée par une équipe citoyenne issue de l'opposition municipale de Léognan, l'application est pensée comme un service public que la mairie n'a pas encore fourni. Elle n'est pas un outil politique : c'est un service d'utilité publique locale, ouvert à toutes les associations, commerçants et organisateurs qui veulent donner de la visibilité à leurs événements.</p>
+
+<div class="callout">
+  <strong>Fenêtre d'opportunité.</strong> La mairie envisage un appel d'offres pour une app officielle, mais le projet est sans calendrier. Ma Ville Agenda peut s'imposer comme la référence locale avant que l'institution ne se mette en mouvement.
+</div>
+
+<h2>Le problème</h2>
+
+<p>Les habitants de Léognan n'ont pas de point d'entrée unique pour savoir ce qui se passe dans leur commune. Les événements sont annoncés en ordre dispersé — Facebook, affiches, bouche-à-oreille — sans agrégation, sans recherche, sans notification. Le résultat : des salles vides à côté d'habitants qui ignoraient que l'événement existait.</p>
+
+<p>La mairie a les moyens de régler ce problème mais n'en fait pas une priorité. L'absence d'outil numérique centralisé est un signal de décrochage entre l'institution et la vie associative et commerciale de la commune.</p>
+
+<h2>La solution</h2>
+
+<div class="version-grid">
+  <div class="version-card mvp">
+    <h4>MVP — Démo fonctionnelle</h4>
+    <ul>
+      <li>Liste filtrée par catégorie</li>
+      <li>Fiche détail événement</li>
+      <li>Navigation par date</li>
+      <li>Données de démonstration</li>
+      <li>iOS + Android</li>
+    </ul>
+  </div>
+  <div class="version-card v2">
+    <h4>V2 — Plateforme ouverte</h4>
+    <ul>
+      <li>Backoffice organisateurs</li>
+      <li>Flux de modération</li>
+      <li>Notifications push</li>
+      <li>Publication FB / Instagram</li>
+    </ul>
+  </div>
+</div>
+
+<div class="version-card v3" style="margin-bottom:20px;">
+  <h4>V3+ — Marque blanche</h4>
+  <ul style="columns:2;gap:20px;">
+    <li>Architecture multi-tenant</li>
+    <li>Identité visuelle par commune</li>
+    <li>Déploiement sans refonte</li>
+    <li>Léognan comme référence</li>
+  </ul>
+</div>
+
+<h2>Structure d'un événement</h2>
+
+<table>
+  <tr><th>Champ</th><th>Détail</th></tr>
+  <tr><td>Titre</td><td>Texte court</td></tr>
+  <tr><td>Description</td><td>Texte libre</td></tr>
+  <tr><td>Image</td><td>Illustration de l'événement</td></tr>
+  <tr><td>Début</td><td>Date + heure, ou journée entière</td></tr>
+  <tr><td>Fin</td><td>Date + heure, ou journée entière</td></tr>
+  <tr><td>Catégorie</td><td>Culture · Sport · Animation · Commerce · Autre</td></tr>
+  <tr><td>Lien</td><td>Optionnel — billetterie, site, page Facebook…</td></tr>
+</table>
+
+<h2>Ce qui nous différencie</h2>
+
+<ul>
+  <li><strong>Premiers sur Léognan.</strong> Aucun équivalent n'existe. Le premier outil qui s'impose devient la référence.</li>
+  <li><strong>Service citoyen, pas outil institutionnel.</strong> L'app appartient aux habitants et aux acteurs locaux — c'est sa force et sa légitimité.</li>
+  <li><strong>Ouvert aux acteurs locaux dès la V2.</strong> Associations et commerçants contribuent directement, sans arbitrages politiques.</li>
+  <li><strong>Avantage de vitesse.</strong> Être en ligne avant que la mairie ne publie son appel d'offres est l'atout décisif.</li>
+</ul>
+
+<h2>Pour qui</h2>
+
+<p><strong>L'habitant de Léognan</strong> — curieux de la vie locale, abonné à quelques pages Facebook mais las de chercher. Il veut savoir ce qui se passe ce week-end sans effort.</p>
+
+<p><strong>L'organisateur local (V2)</strong> — président d'association sportive, commerçant, organisateur privé. Il veut de la visibilité sans friction administrative.</p>
+
+<p><strong>L'équipe de modération</strong> — cinq membres de l'équipe citoyenne, chargés de valider les soumissions et garantir la qualité éditoriale.</p>
+
+<h2>Critères de succès</h2>
+
+<div class="metrics">
+  <div class="metric-card">
+    <div class="label">Téléchargements · 3 mois</div>
+    <div class="value">500</div>
+  </div>
+  <div class="metric-card">
+    <div class="label">Taux lecture notifs (V2)</div>
+    <div class="value">À mesurer</div>
+  </div>
+  <div class="metric-card">
+    <div class="label">Comptes backoffice actifs (V2)</div>
+    <div class="value">À mesurer</div>
+  </div>
+  <div class="metric-card">
+    <div class="label">Score usage composite</div>
+    <div class="value">Sessions · Retour · Durée</div>
+  </div>
+</div>
+
+<h2>Vision</h2>
+
+<div class="vision-box">
+  <p>Dans deux à trois ans, Ma Ville Agenda tourne sur plusieurs communes de la métropole bordelaise. Chaque déploiement est une instance indépendante, brandée aux couleurs de la commune, alimentée par ses acteurs locaux. L'équipe de Léognan a construit la référence : la preuve qu'une initiative citoyenne peut devancer l'institution — et l'essaimer.</p>
+</div>
+
+</div>
+</body>
+</html>
