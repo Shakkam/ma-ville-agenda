@@ -1,0 +1,67 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model for super-admin authentication
+model User {
+  id        String     @id @default(cuid())
+  email     String     @unique
+  password  String     // bcrypt hashed
+  role      UserRole   @default(SUPER_ADMIN)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  events Event[]
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  MODERATOR
+}
+
+// Event model
+model Event {
+  id          String        @id @default(cuid())
+  title       String
+  description String
+  imageUrl    String?
+  startDate   DateTime
+  endDate     DateTime
+  category    EventCategory
+  location    String
+  externalUrl String?
+  status      EventStatus   @default(DRAFT)
+  createdBy   String        // User ID
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  user User @relation(fields: [createdBy], references: [id])
+
+  @@index([status])
+  @@index([category])
+  @@index([startDate])
+}
+
+enum EventCategory {
+  CULTURE
+  SPORT
+  ANIMATION
+  COMMERCE
+  AUTRE
+}
+
+enum EventStatus {
+  DRAFT
+  PENDING
+  PUBLISHED
+  REJECTED
+  ARCHIVED
+}
