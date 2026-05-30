@@ -9,6 +9,7 @@ import { prisma } from './db/prisma.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { eventsRouter } from './routes/events.js';
 import { authRouter } from './routes/auth.js';
+import { uploadRouter, UPLOADS_DIR } from './routes/upload.js';
 
 const app = express();
 const PORT = parseInt(process.env.PORT || '3000');
@@ -25,6 +26,12 @@ app.get('/health', (_req, res) => {
 
 app.use('/api/events', eventsRouter);
 app.use('/api/auth', authRouter);
+app.use('/api/upload', uploadRouter);
+
+// Serve uploaded images statically (cross-origin so the backoffice <img> can load them)
+app.use('/uploads', express.static(UPLOADS_DIR, {
+  setHeaders: (res) => res.setHeader('Access-Control-Allow-Origin', '*'),
+}));
 
 app.use(errorHandler);
 

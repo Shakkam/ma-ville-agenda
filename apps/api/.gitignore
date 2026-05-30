@@ -8,6 +8,9 @@ node_modules/
 .env.local
 .env.*.local
 
+# Uploaded images (local dev storage)
+uploads/
+
 # Build
 /dist
 /build

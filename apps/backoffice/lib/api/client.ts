@@ -19,6 +19,19 @@ client.interceptors.request.use((config) => {
   return config;
 });
 
+export const uploadApi = {
+  // Uploads an image file (already compressed client-side) and returns its URL.
+  uploadImage: async (file: File | Blob, filename = 'image.jpg'): Promise<string> => {
+    const formData = new FormData();
+    formData.append('image', file, filename);
+    const response = await client.post<{ url: string }>('/upload', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      timeout: 30000,
+    });
+    return response.data.url;
+  },
+};
+
 export const authApi = {
   login: async (email: string, password: string) => {
     const response = await client.post<{ token: string; user: User }>('/auth/login', {

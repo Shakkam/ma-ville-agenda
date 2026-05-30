@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { eventApi } from '@/lib/api/client';
 import type { EventCategory, CreateEventInput } from '@/lib/types';
+import { ImageDropzone } from '@/components/ImageDropzone';
 import styles from './page.module.css';
 
 export default function CreateEventPage() {
@@ -156,14 +157,10 @@ export default function CreateEventPage() {
             </div>
 
             <div className={styles.field}>
-              <label htmlFor="imageUrl">URL de l'image (optionnel)</label>
-              <input
-                id="imageUrl"
-                name="imageUrl"
-                type="url"
-                value={formData.imageUrl || ''}
-                onChange={handleChange}
-                placeholder="https://example.com/image.jpg"
+              <label>Image (optionnel)</label>
+              <ImageDropzone
+                value={formData.imageUrl}
+                onChange={(url) => setFormData((prev) => ({ ...prev, imageUrl: url }))}
               />
             </div>
 
