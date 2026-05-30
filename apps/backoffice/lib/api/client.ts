@@ -45,8 +45,10 @@ export const authApi = {
 };
 
 export const eventApi = {
+  // Admin list: returns events of ALL statuses (requires auth), so the
+  // backoffice can show pending submissions, not just published ones.
   getAll: async () => {
-    const response = await client.get<Event[]>('/events');
+    const response = await client.get<Event[]>('/events/admin');
     return response.data;
   },
 

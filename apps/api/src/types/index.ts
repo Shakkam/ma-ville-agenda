@@ -1,4 +1,7 @@
-import { EventCategory, EventStatus } from '@prisma/client';
+// Defined locally as string-literal unions: the Prisma schema uses String
+// columns (SQLite has no enum support), so @prisma/client generates no enums.
+export type EventCategory = 'CULTURE' | 'SPORT' | 'ANIMATION' | 'COMMERCE' | 'AUTRE';
+export type EventStatus = 'DRAFT' | 'PENDING' | 'PUBLISHED' | 'REJECTED' | 'ARCHIVED';
 
 export interface CreateEventInput {
   title: string;

@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { prisma } from '../db/prisma.js';
 import { authMiddleware } from '../middleware/auth.js';
 import { AppError } from '../middleware/errorHandler.js';
-import { CreateEventInput, EventCategory } from '../types/index.js';
+import { EventCategory } from '../types/index.js';
 
 export const eventsRouter = Router();
 
@@ -36,6 +36,23 @@ eventsRouter.get('/', async (req, res) => {
     if (startDate) where.startDate.gte = new Date(startDate as string);
     if (endDate) where.startDate.lte = new Date(endDate as string);
   }
+
+  const events = await prisma.event.findMany({
+    where,
+    orderBy: { startDate: 'asc' },
+  });
+
+  res.json(events);
+});
+
+// GET /api/events/admin - List ALL events regardless of status (super-admin only)
+// Defined before /:id so "admin" is not captured as an event id.
+eventsRouter.get('/admin', authMiddleware, async (req, res) => {
+  const { status, category } = req.query;
+
+  const where: any = {};
+  if (status) where.status = status as string;
+  if (category) where.category = category as EventCategory;
 
   const events = await prisma.event.findMany({
     where,

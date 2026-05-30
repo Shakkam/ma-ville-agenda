@@ -84,7 +84,7 @@ authRouter.post('/verify', async (req, res) => {
 
   // TODO: Verify JWT token
   const decoded = Buffer.from(token, 'base64').toString('utf-8');
-  const [userId, email] = decoded.split(':');
+  const [userId] = decoded.split(':');
 
   const user = await prisma.user.findUnique({
     where: { id: userId },
