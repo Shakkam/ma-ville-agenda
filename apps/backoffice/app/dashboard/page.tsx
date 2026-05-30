@@ -47,6 +47,15 @@ export default function DashboardPage() {
   const pendingEvents = events.filter((e) => e.status === 'PENDING');
   const publishedEvents = events.filter((e) => e.status === 'PUBLISHED');
 
+  const eventCardLink: React.CSSProperties = {
+    display: 'block',
+    padding: '12px',
+    border: '1px solid #e0e0e0',
+    borderRadius: '6px',
+    textDecoration: 'none',
+    cursor: 'pointer',
+  };
+
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#f8f9fa' }}>
       {/* Header */}
@@ -111,12 +120,12 @@ export default function DashboardPage() {
                 <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
                   {pendingEvents.map((event) => (
                     <li key={event.id}>
-                      <div style={{ padding: '12px', border: '1px solid #e0e0e0', borderRadius: '6px' }}>
-                        <h3 style={{ margin: '0 0 4px 0', fontSize: '16px' }}>{event.title}</h3>
+                      <Link href={`/dashboard/events/${event.id}`} style={eventCardLink}>
+                        <h3 style={{ margin: '0 0 4px 0', fontSize: '16px', color: '#212121' }}>{event.title}</h3>
                         <p style={{ margin: 0, fontSize: '12px', color: '#757575' }}>
-                          {new Date(event.startDate).toLocaleDateString('fr-FR')}
+                          {new Date(event.startDate).toLocaleDateString('fr-FR')} · cliquer pour valider →
                         </p>
-                      </div>
+                      </Link>
                     </li>
                   ))}
                 </ul>
@@ -137,12 +146,12 @@ export default function DashboardPage() {
                 <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
                   {publishedEvents.map((event) => (
                     <li key={event.id}>
-                      <div style={{ padding: '12px', border: '1px solid #e0e0e0', borderRadius: '6px' }}>
-                        <h3 style={{ margin: '0 0 4px 0', fontSize: '16px' }}>{event.title}</h3>
+                      <Link href={`/dashboard/events/${event.id}`} style={eventCardLink}>
+                        <h3 style={{ margin: '0 0 4px 0', fontSize: '16px', color: '#212121' }}>{event.title}</h3>
                         <p style={{ margin: 0, fontSize: '12px', color: '#757575' }}>
                           📅 {new Date(event.startDate).toLocaleDateString('fr-FR')} | 📍 {event.location}
                         </p>
-                      </div>
+                      </Link>
                     </li>
                   ))}
                 </ul>

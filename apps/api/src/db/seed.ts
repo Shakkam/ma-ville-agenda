@@ -87,20 +87,31 @@ const seed = async () => {
   ];
 
   for (const eventData of events) {
+    // Deterministic id (slug) keyed on the title so re-running the seed
+    // updates the same row instead of creating duplicates (idempotent).
+    const id = eventData.title
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[̀-ͯ]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '');
+
+    const data = {
+      title: eventData.title,
+      description: eventData.description,
+      category: eventData.category,
+      location: eventData.location,
+      startDate: eventData.startDate,
+      endDate: eventData.endDate,
+      imageUrl: eventData.imageUrl,
+      status: 'PUBLISHED',
+      createdBy: user.id,
+    };
+
     await prisma.event.upsert({
-      where: { id: eventData.title.toLowerCase().replace(/\s+/g, '-') },
-      update: {},
-      create: {
-        title: eventData.title,
-        description: eventData.description,
-        category: eventData.category,
-        location: eventData.location,
-        startDate: eventData.startDate,
-        endDate: eventData.endDate,
-        imageUrl: eventData.imageUrl,
-        status: 'PUBLISHED',
-        createdBy: user.id,
-      },
+      where: { id },
+      update: data,
+      create: { id, ...data },
     });
   }
 
