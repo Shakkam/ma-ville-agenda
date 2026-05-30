@@ -36,10 +36,22 @@ export default function CreateEventPage() {
     setLoading(true);
 
     try {
-      await eventApi.create(formData);
+      // <input type="datetime-local"> yields "YYYY-MM-DDTHH:mm" which fails the
+      // API's strict ISO 8601 validation — convert to a full ISO string (with Z).
+      const payload: CreateEventInput = {
+        ...formData,
+        startDate: new Date(formData.startDate).toISOString(),
+        endDate: new Date(formData.endDate).toISOString(),
+        // Drop empty optional URL fields so they don't fail url() validation.
+        imageUrl: formData.imageUrl || undefined,
+        externalUrl: formData.externalUrl || undefined,
+      };
+      await eventApi.create(payload);
       router.push('/dashboard');
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to create event';
+      const apiMessage = (err as { response?: { data?: { message?: string } } })?.response?.data
+        ?.message;
+      const message = apiMessage || (err instanceof Error ? err.message : 'Échec de la création');
       setError(message);
     } finally {
       setLoading(false);
