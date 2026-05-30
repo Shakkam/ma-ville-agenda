@@ -1,25 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 import { prisma } from '../db/prisma.js';
 import { AppError } from './errorHandler.js';
+import { verifyToken } from '../utils/jwt.js';
 
-// MVP token format: base64("<userId>:<email>"), generated in routes/auth.ts.
-// Real signed JWT is deferred to Epic 5 (Auth & Security).
-const decodeToken = (token: string): { userId: string; email: string } | null => {
-  try {
-    const decoded = Buffer.from(token, 'base64').toString('utf-8');
-    const idx = decoded.indexOf(':');
-    if (idx === -1) return null;
-    const userId = decoded.slice(0, idx);
-    const email = decoded.slice(idx + 1);
-    if (!userId || !email) return null;
-    return { userId, email };
-  } catch {
-    return null;
-  }
-};
-
+// Resolves the authenticated user from a signed JWT, confirming the user
+// still exists and the embedded email matches the current record.
 const resolveUser = async (token: string) => {
-  const payload = decodeToken(token);
+  const payload = verifyToken(token);
   if (!payload) return null;
   const user = await prisma.user.findUnique({ where: { id: payload.userId } });
   if (!user || user.email !== payload.email) return null;

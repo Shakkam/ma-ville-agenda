@@ -1,15 +1,18 @@
+import bcrypt from 'bcryptjs';
 import { prisma } from './prisma.js';
 
 const seed = async () => {
   console.log('🌱 Seeding database...');
 
-  // Create super-admin user
+  // Create super-admin user with a bcrypt-hashed password.
+  // `update` also re-hashes so an existing dev DB (plaintext) gets fixed on re-seed.
+  const hashedPassword = await bcrypt.hash('admin123', 10);
   const user = await prisma.user.upsert({
     where: { email: 'admin@ma-ville-agenda.local' },
-    update: {},
+    update: { password: hashedPassword },
     create: {
       email: 'admin@ma-ville-agenda.local',
-      password: 'admin123', // TODO: Replace with secure password in production
+      password: hashedPassword,
       role: 'SUPER_ADMIN',
     },
   });
