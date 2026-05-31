@@ -6,8 +6,12 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  // Pooled connection for queries (serverless-friendly).
+  url       = env("DATABASE_URL")
+  // Direct connection for migrations (Prisma needs a non-pooled URL).
+  // In local dev both can point to the same connection string.
+  directUrl = env("DIRECT_DATABASE_URL")
 }
 
 // User model for super-admin authentication

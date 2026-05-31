@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd *)",
+      "Bash(npm *)",
+      "Bash(npx *)",
+      "Bash(node *)",
+      "Bash(git *)",
+      "Bash(curl *)",
+      "Bash(echo *)",
+      "Bash(ls *)",
+      "Bash(sleep *)",
+      "Bash(until *)",
+      "Bash(for *)",
+      "Bash(adb *)",
+      "Bash(*/adb.exe *)",
+      "Bash(*/platform-tools/adb.exe *)",
+      "Read",
+      "Grep",
+      "Glob",
+      "PowerShell(Get-NetTCPConnection*)",
+      "PowerShell(Stop-Process*)"
+    ]
+  }
+}
