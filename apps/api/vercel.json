@@ -1,5 +1,8 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "buildCommand": "mkdir -p public && echo 'Ma Ville Agenda API' > public/index.html",
+  "outputDirectory": "public",
   "rewrites": [
     { "source": "/(.*)", "destination": "/api" }
   ]
