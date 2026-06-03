@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { useEventStore } from '@/store/eventStore';
 import { EventCard } from '@/components/EventCard';
 import { CategoryFilter } from '@/components/CategoryFilter';
+import { Hero, SponsorFooter } from '@/components/Hero';
 import { colors, spacing } from '@/styles/colors';
 import type { Event } from '@/types/index';
 
@@ -26,46 +27,46 @@ export default function EventsScreen() {
     router.push(`/event/${event.id}`);
   };
 
-  if (loading && filteredEvents.length === 0) {
-    return (
-      <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color={colors.primary} />
-      </View>
-    );
-  }
-
   if (error) {
     return (
-      <View style={styles.centerContainer}>
-        <Text style={styles.errorText}>Erreur: {error}</Text>
+      <View style={styles.container}>
+        <Hero />
+        <View style={styles.centerContainer}>
+          <Text style={styles.errorText}>Erreur: {error}</Text>
+        </View>
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      <CategoryFilter
-        selected={selectedCategory}
-        onSelect={setSelectedCategory}
+      <FlatList
+        data={filteredEvents}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <EventCard event={item} onPress={() => handleEventPress(item)} />
+        )}
+        ListHeaderComponent={
+          <>
+            <Hero />
+            <CategoryFilter
+              selected={selectedCategory}
+              onSelect={setSelectedCategory}
+            />
+          </>
+        }
+        ListEmptyComponent={
+          <View style={styles.emptyBox}>
+            {loading ? (
+              <ActivityIndicator size="large" color={colors.primary} />
+            ) : (
+              <Text style={styles.emptyText}>Aucun événement trouvé</Text>
+            )}
+          </View>
+        }
+        ListFooterComponent={<SponsorFooter />}
+        contentContainerStyle={styles.listContent}
       />
-
-      {filteredEvents.length === 0 ? (
-        <View style={styles.centerContainer}>
-          <Text style={styles.emptyText}>
-            Aucun événement trouvé
-          </Text>
-        </View>
-      ) : (
-        <FlatList
-          data={filteredEvents}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <EventCard event={item} onPress={() => handleEventPress(item)} />
-          )}
-          contentContainerStyle={styles.listContent}
-          scrollEnabled={true}
-        />
-      )}
     </View>
   );
 }
@@ -82,6 +83,10 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingBottom: spacing.lg,
+  },
+  emptyBox: {
+    paddingVertical: spacing.xl,
+    alignItems: 'center',
   },
   errorText: {
     color: colors.error,
