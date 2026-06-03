@@ -12,7 +12,7 @@ export default function DashboardPage() {
   const [mounted, setMounted] = useState(false);
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(false);
-  const { isAuthenticated, logout } = useAuthStore();
+  const { isAuthenticated, logout, user } = useAuthStore();
 
   useEffect(() => {
     setMounted(true);
@@ -88,7 +88,7 @@ export default function DashboardPage() {
       <main style={{ padding: '32px 0' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 16px' }}>
           {/* Actions */}
-          <div style={{ marginBottom: '32px' }}>
+          <div style={{ marginBottom: '32px', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
             <Link href="/dashboard/create" style={{
               display: 'inline-block',
               backgroundColor: '#2d93c4',
@@ -100,6 +100,20 @@ export default function DashboardPage() {
             }}>
               ➕ Créer un événement
             </Link>
+            {user?.role === 'SUPER_ADMIN' && (
+              <Link href="/dashboard/users" style={{
+                display: 'inline-block',
+                backgroundColor: 'white',
+                color: '#2d93c4',
+                border: '1px solid #2d93c4',
+                padding: '12px 24px',
+                borderRadius: '6px',
+                textDecoration: 'none',
+                fontWeight: '600',
+              }}>
+                👥 Gérer les utilisateurs
+              </Link>
+            )}
           </div>
 
           {/* Grid */}

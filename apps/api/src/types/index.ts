@@ -39,9 +39,12 @@ export interface ApiError {
   statusCode: number;
 }
 
+export type UserRole = 'SUPER_ADMIN' | 'MODERATOR';
+
 export interface AuthPayload {
   userId: string;
   email: string;
+  role: UserRole;
 }
 
 declare global {

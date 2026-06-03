@@ -5,6 +5,7 @@ import 'express-async-errors';
 import { errorHandler } from './middleware/errorHandler.js';
 import { eventsRouter } from './routes/events.js';
 import { authRouter } from './routes/auth.js';
+import { usersRouter } from './routes/users.js';
 import { uploadRouter, UPLOADS_DIR } from './routes/upload.js';
 
 // Allowed CORS origins are configurable so the deployed backoffice domain
@@ -36,6 +37,7 @@ app.get('/health', (_req, res) => {
 
 app.use('/api/events', eventsRouter);
 app.use('/api/auth', authRouter);
+app.use('/api/users', usersRouter);
 app.use('/api/upload', uploadRouter);
 
 // Local-only static serving of disk uploads. In production images live in

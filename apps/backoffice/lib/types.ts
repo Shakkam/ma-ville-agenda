@@ -16,10 +16,20 @@ export interface Event {
   updatedAt: string;
 }
 
+export type UserRole = 'SUPER_ADMIN' | 'MODERATOR';
+
 export interface User {
   id: string;
   email: string;
-  role: 'SUPER_ADMIN' | 'MODERATOR';
+  role: UserRole;
+}
+
+export interface ManagedUser {
+  id: string;
+  email: string;
+  role: UserRole;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface AuthState {

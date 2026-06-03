@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { Event, CreateEventInput, User } from '../types';
+import type { Event, CreateEventInput, User, ManagedUser, UserRole } from '../types';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
 
@@ -29,6 +29,24 @@ export const uploadApi = {
       timeout: 30000,
     });
     return response.data.url;
+  },
+};
+
+export const usersApi = {
+  list: async (): Promise<ManagedUser[]> => {
+    const response = await client.get<ManagedUser[]>('/users');
+    return response.data;
+  },
+  create: async (email: string, password: string, role: UserRole): Promise<ManagedUser> => {
+    const response = await client.post<ManagedUser>('/users', { email, password, role });
+    return response.data;
+  },
+  updateRole: async (id: string, role: UserRole): Promise<ManagedUser> => {
+    const response = await client.patch<ManagedUser>(`/users/${id}/role`, { role });
+    return response.data;
+  },
+  remove: async (id: string): Promise<void> => {
+    await client.delete(`/users/${id}`);
   },
 };
 
