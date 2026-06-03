@@ -66,10 +66,6 @@ export default function LoginPage() {
             {loading ? 'Connexion...' : 'Se connecter'}
           </button>
         </form>
-
-        <p className={styles.info}>
-          Pour la démo: email/password = admin@ma-ville-agenda.local / admin123
-        </p>
       </div>
     </div>
   );
