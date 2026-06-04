@@ -4,6 +4,7 @@ import { prisma } from '../db/prisma.js';
 import { authMiddleware } from '../middleware/auth.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { EventCategory } from '../types/index.js';
+import { broadcastPush } from '../utils/push.js';
 
 export const eventsRouter = Router();
 
@@ -131,10 +132,20 @@ eventsRouter.put('/:id/validate', authMiddleware, async (req, res) => {
     throw new AppError(404, 'NOT_FOUND', 'Event not found');
   }
 
+  const wasPublished = event.status === 'PUBLISHED';
   const updated = await prisma.event.update({
     where: { id },
     data: { status: 'PUBLISHED' },
   });
+
+  // Notify residents on the transition into PUBLISHED (not on re-validation).
+  if (!wasPublished) {
+    await broadcastPush({
+      title: 'Nouvel événement à Léognan',
+      body: updated.title,
+      data: { eventId: updated.id },
+    });
+  }
 
   res.json(updated);
 });
