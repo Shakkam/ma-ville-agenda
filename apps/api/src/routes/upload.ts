@@ -10,9 +10,14 @@ import { AppError } from '../middleware/errorHandler.js';
 export const uploadRouter = Router();
 
 // Local disk dir used only when Vercel Blob is not configured (dev).
+// Guarded: on serverless (read-only fs) creating it would throw at import.
 export const UPLOADS_DIR = path.join(process.cwd(), 'uploads');
-if (!fs.existsSync(UPLOADS_DIR)) {
-  fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+try {
+  if (!fs.existsSync(UPLOADS_DIR)) {
+    fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+  }
+} catch {
+  /* read-only filesystem (e.g. Vercel) — disk uploads disabled, Blob is used instead */
 }
 
 const ALLOWED_MIME = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
@@ -57,6 +62,16 @@ uploadRouter.post('/', authMiddleware, upload.single('image'), async (req, res) 
     });
     res.status(201).json({ url: blob.url });
     return;
+  }
+
+  // No Blob configured. On serverless the filesystem is read-only, so disk
+  // storage can't work — return a clear, actionable error instead of a 500.
+  if (process.env.VERCEL) {
+    throw new AppError(
+      503,
+      'STORAGE_NOT_CONFIGURED',
+      "L'upload d'images nécessite Vercel Blob (variable BLOB_READ_WRITE_TOKEN manquante)."
+    );
   }
 
   // Dev fallback: write to local disk and return a localhost URL.
