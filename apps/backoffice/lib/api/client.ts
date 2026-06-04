@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { Event, CreateEventInput, User, ManagedUser, UserRole } from '../types';
+import type { Event, CreateEventInput, User, ManagedUser, UserRole, InviteResult } from '../types';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
 
@@ -37,8 +37,8 @@ export const usersApi = {
     const response = await client.get<ManagedUser[]>('/users');
     return response.data;
   },
-  create: async (email: string, password: string, role: UserRole): Promise<ManagedUser> => {
-    const response = await client.post<ManagedUser>('/users', { email, password, role });
+  invite: async (email: string, role: UserRole): Promise<InviteResult> => {
+    const response = await client.post<InviteResult>('/users/invite', { email, role });
     return response.data;
   },
   updateRole: async (id: string, role: UserRole): Promise<ManagedUser> => {
@@ -59,9 +59,9 @@ export const authApi = {
     return response.data;
   },
 
-  register: async (email: string, password: string) => {
-    const response = await client.post<{ token: string; user: User }>('/auth/register', {
-      email,
+  acceptInvite: async (token: string, password: string) => {
+    const response = await client.post<{ token: string; user: User }>('/auth/accept-invite', {
+      token,
       password,
     });
     return response.data;

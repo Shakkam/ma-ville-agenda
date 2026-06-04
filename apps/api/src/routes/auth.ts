@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 import { prisma } from '../db/prisma.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { signToken, verifyToken } from '../utils/jwt.js';
@@ -14,9 +15,9 @@ const loginSchema = z.object({
   password: z.string().min(1),
 });
 
-const registerSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
+const acceptInviteSchema = z.object({
+  token: z.string().min(1),
+  password: z.string().min(8, 'Le mot de passe doit faire au moins 8 caractères'),
 });
 
 // POST /api/auth/login - Super-admin login
@@ -26,6 +27,11 @@ authRouter.post('/login', async (req, res) => {
   const user = await prisma.user.findUnique({
     where: { email },
   });
+
+  // A pending invitation has no password yet — guide the user to activate.
+  if (user && user.status === 'INVITED') {
+    throw new AppError(403, 'ACCOUNT_NOT_ACTIVE', 'Compte non activé — utilisez votre lien d\'invitation');
+  }
 
   // Always run a comparison to avoid leaking whether the email exists via timing.
   const hash = user?.password ?? '$2a$10$invalidinvalidinvalidinvalidinvalidinvalidinvalidinva';
@@ -47,37 +53,38 @@ authRouter.post('/login', async (req, res) => {
   });
 });
 
-// POST /api/auth/register - Create super-admin (dev only)
-authRouter.post('/register', async (req, res) => {
-  const { email, password } = registerSchema.parse(req.body);
+// POST /api/auth/accept-invite - set password from an invitation token, activate, auto-login
+authRouter.post('/accept-invite', async (req, res) => {
+  const { token, password } = acceptInviteSchema.parse(req.body);
 
-  const existing = await prisma.user.findUnique({
-    where: { email },
+  const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+  const user = await prisma.user.findFirst({
+    where: {
+      inviteTokenHash: tokenHash,
+      status: 'INVITED',
+      inviteExpiresAt: { gt: new Date() },
+    },
   });
 
-  if (existing) {
-    throw new AppError(400, 'USER_EXISTS', 'User already exists');
+  if (!user) {
+    throw new AppError(400, 'INVALID_INVITE', 'Invitation invalide ou expirée');
   }
 
   const hashedPassword = await bcrypt.hash(password, BCRYPT_ROUNDS);
-
-  const user = await prisma.user.create({
+  const updated = await prisma.user.update({
+    where: { id: user.id },
     data: {
-      email,
       password: hashedPassword,
-      role: 'SUPER_ADMIN',
+      status: 'ACTIVE',
+      inviteTokenHash: null,
+      inviteExpiresAt: null,
     },
   });
 
-  const token = signToken({ userId: user.id, email: user.email });
-
-  res.status(201).json({
-    token,
-    user: {
-      id: user.id,
-      email: user.email,
-      role: user.role,
-    },
+  const jwt = signToken({ userId: updated.id, email: updated.email });
+  res.json({
+    token: jwt,
+    user: { id: updated.id, email: updated.email, role: updated.role },
   });
 });
 

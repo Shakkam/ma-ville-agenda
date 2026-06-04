@@ -14,12 +14,18 @@ datasource db {
   directUrl = env("DIRECT_DATABASE_URL")
 }
 
-// User model for super-admin authentication
+// User model for backoffice authentication (super-admin + moderators)
 model User {
   id        String     @id @default(cuid())
   email     String     @unique
-  password  String     // bcrypt hashed
+  password  String?    // bcrypt hashed; null while the invitation is pending
   role      String     @default("SUPER_ADMIN")
+  status    String     @default("ACTIVE") // ACTIVE | INVITED
+
+  // Invitation flow: sha256(token) stored at rest, queryable on accept.
+  inviteTokenHash String?
+  inviteExpiresAt DateTime?
+
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
 

@@ -4,7 +4,7 @@ import type { AuthState } from '../types';
 
 interface AuthStore extends AuthState {
   login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string) => Promise<void>;
+  acceptInvite: (inviteToken: string, password: string) => Promise<void>;
   logout: () => void;
   verifyToken: () => Promise<void>;
 }
@@ -27,17 +27,12 @@ export const useAuthStore = create<AuthStore>()((set) => ({
     }
   },
 
-  register: async (email: string, password: string) => {
-    try {
-      const { token, user } = await authApi.register(email, password);
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('token', token);
-      }
-      set({ token, user, isAuthenticated: true });
-    } catch (error) {
-      console.error('Registration failed:', error);
-      throw error;
+  acceptInvite: async (inviteToken: string, password: string) => {
+    const { token, user } = await authApi.acceptInvite(inviteToken, password);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('token', token);
     }
+    set({ token, user, isAuthenticated: true });
   },
 
   logout: () => {

@@ -24,12 +24,22 @@ export interface User {
   role: UserRole;
 }
 
+export type UserStatus = 'ACTIVE' | 'INVITED';
+
 export interface ManagedUser {
   id: string;
   email: string;
   role: UserRole;
+  status: UserStatus;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface InviteResult {
+  user: ManagedUser;
+  inviteUrl: string;
+  emailSent: boolean;
+  emailError?: string;
 }
 
 export interface AuthState {
