@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { SponsorFooter } from '@/components/Hero';
 import { colors, spacing, typography } from '@/styles/colors';
 
 export default function AboutScreen() {
@@ -23,6 +24,8 @@ export default function AboutScreen() {
         <Text style={styles.section}>Licence</Text>
         <Text style={styles.text}>MIT</Text>
       </View>
+
+      <SponsorFooter />
     </ScrollView>
   );
 }
