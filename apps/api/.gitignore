@@ -42,3 +42,6 @@ prisma/*.db
 prisma/*.sqlite
 
 .vercel
+
+# Integration test env (DB creds)
+.env.test
