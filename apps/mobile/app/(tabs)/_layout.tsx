@@ -33,6 +33,14 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
+        name="planning"
+        options={{
+          title: 'Planning',
+          tabBarLabel: 'Planning',
+          tabBarIcon: ({ color }) => <PlanningIcon color={color} />,
+        }}
+      />
+      <Tabs.Screen
         name="about"
         options={{
           title: 'À propos',
@@ -50,6 +58,10 @@ function EventIcon({ color }: { color: string }) {
 
 function InfoIcon({ color }: { color: string }) {
   return <InfoSymbol color={color} />;
+}
+
+function PlanningIcon({ color }: { color: string }) {
+  return <Text style={{ fontSize: 20, color }}>📆</Text>;
 }
 
 // Simple icon replacements (will be replaced with Ionicons in real app)
