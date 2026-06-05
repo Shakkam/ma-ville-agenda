@@ -72,9 +72,18 @@ export default function PlanningScreen() {
     return events.filter((e) => dateKey(new Date(e.startDate)) === selectedDate);
   }, [events, selectedDate]);
 
+  // Open the calendar on the month of the earliest event (not an empty month).
+  const initialMonth = useMemo(() => {
+    if (events.length === 0) return undefined;
+    const earliest = events.reduce((min, e) => (e.startDate < min ? e.startDate : min), events[0].startDate);
+    return dateKey(new Date(earliest));
+  }, [events]);
+
   return (
     <ScrollView style={styles.container}>
       <Calendar
+        key={initialMonth ?? 'today'}
+        current={initialMonth}
         onDayPress={(day) => setSelectedDate(day.dateString)}
         markedDates={markedDates}
         markingType="multi-dot"
