@@ -26,7 +26,6 @@ export default function DashboardPage() {
     }
 
     const fetchEvents = async () => {
-      setLoading(true);
       try {
         const data = await eventApi.getAll();
         setEvents(data);
@@ -37,8 +36,23 @@ export default function DashboardPage() {
       }
     };
 
+    setLoading(true);
     fetchEvents();
+    // Poll so the "pending validation" count stays fresh without a manual reload.
+    const id = setInterval(fetchEvents, 60000);
+    return () => clearInterval(id);
   }, [mounted, isAuthenticated, router]);
+
+  const pendingCount = events.filter((e) => e.status === 'PENDING').length;
+
+  // Surface the pending count in the browser tab title (a passive notification).
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    document.title =
+      pendingCount > 0
+        ? `(${pendingCount}) En attente — Ma Ville Agenda`
+        : 'Ma Ville Agenda — Admin';
+  }, [pendingCount]);
 
   if (!mounted || !isAuthenticated) {
     return <div style={{ padding: '20px' }}>Chargement...</div>;
@@ -87,6 +101,28 @@ export default function DashboardPage() {
       {/* Main Content */}
       <main style={{ padding: '32px 0' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 16px' }}>
+          {/* Pending validation alert */}
+          {pendingCount > 0 && (
+            <a
+              href="#en-attente"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 10,
+                background: 'rgba(255,152,0,0.12)',
+                border: '1px solid rgba(255,152,0,0.4)',
+                color: '#e65100',
+                padding: '14px 18px',
+                borderRadius: 8,
+                marginBottom: 24,
+                fontWeight: 600,
+                textDecoration: 'none',
+              }}
+            >
+              🔔 {pendingCount} événement{pendingCount > 1 ? 's' : ''} en attente de validation
+            </a>
+          )}
+
           {/* Actions */}
           <div style={{ marginBottom: '32px', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
             <Link href="/dashboard/create" style={{
@@ -119,7 +155,7 @@ export default function DashboardPage() {
           {/* Grid */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(500px, 1fr))', gap: '24px' }}>
             {/* Pending Events */}
-            <section style={{
+            <section id="en-attente" style={{
               background: 'white',
               borderRadius: '8px',
               padding: '24px',
