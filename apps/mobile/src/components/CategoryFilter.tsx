@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, ScrollView, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { colors, spacing, typography } from '../styles/colors';
 import type { EventCategory } from '../types/index';
 
@@ -21,7 +21,7 @@ const categories: Array<{ label: string; value: EventCategory }> = [
 export const CategoryFilter: React.FC<CategoryFilterProps> = ({ selected, onSelect }) => {
   return (
     <View style={styles.container}>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+      <View style={styles.row}>
         <TouchableOpacity
           style={[styles.chip, selected === null && styles.chipSelected]}
           onPress={() => onSelect(null)}
@@ -55,7 +55,7 @@ export const CategoryFilter: React.FC<CategoryFilterProps> = ({ selected, onSele
             </Text>
           </TouchableOpacity>
         ))}
-      </ScrollView>
+      </View>
     </View>
   );
 };
@@ -63,10 +63,15 @@ export const CategoryFilter: React.FC<CategoryFilterProps> = ({ selected, onSele
 const styles = StyleSheet.create({
   container: {
     paddingVertical: spacing.md,
+    paddingHorizontal: spacing.md,
     backgroundColor: colors.surface,
   },
+  row: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.sm,
+  },
   chip: {
-    marginHorizontal: spacing.sm,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     borderRadius: 20,
