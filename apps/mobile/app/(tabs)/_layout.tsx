@@ -61,12 +61,12 @@ function InfoIcon({ color }: { color: string }) {
 }
 
 function PlanningIcon({ color }: { color: string }) {
-  return <Text style={{ fontSize: 20, color }}>📆</Text>;
+  return <Text style={{ fontSize: 20, color }}>📅</Text>;
 }
 
 // Simple icon replacements (will be replaced with Ionicons in real app)
 function EventSymbol({ color }: { color: string }) {
-  return <Text style={{ fontSize: 20, color }}>📅</Text>;
+  return <Text style={{ fontSize: 20, color }}>📋</Text>;
 }
 
 function InfoSymbol({ color }: { color: string }) {

@@ -18,7 +18,7 @@ LocaleConfig.locales['fr'] = {
 LocaleConfig.defaultLocale = 'fr';
 
 const CATEGORY_ICON: Record<EventCategory, string> = {
-  CULTURE: '🎭',
+  CULTURE: '🎸',
   SPORT: '🏅',
   ANIMATION: '🎉',
   COMMERCE: '🛍️',
@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
   dayCell: {
     alignItems: 'center',
     justifyContent: 'flex-start',
-    minHeight: 46,
+    minHeight: 54,
     paddingTop: 2,
   },
   dayNumWrap: {
@@ -191,12 +191,12 @@ const styles = StyleSheet.create({
   },
   dayIcons: {
     flexDirection: 'row',
-    gap: 1,
-    marginTop: 1,
-    height: 14,
+    gap: 2,
+    marginTop: 3,
+    height: 20,
   },
   dayIcon: {
-    fontSize: 11,
+    fontSize: 16,
   },
   legend: {
     flexDirection: 'row',
