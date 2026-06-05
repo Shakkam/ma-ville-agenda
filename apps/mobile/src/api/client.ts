@@ -27,4 +27,10 @@ export const eventApi = {
   },
 };
 
+export const pushApi = {
+  register: async (token: string, platform?: string): Promise<void> => {
+    await client.post('/push/register', { token, platform });
+  },
+};
+
 export default client;

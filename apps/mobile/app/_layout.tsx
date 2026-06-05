@@ -1,9 +1,15 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { colors } from '@/styles/colors';
+import { registerForPushNotifications } from '@/lib/registerPush';
 
 export default function RootLayout() {
+  useEffect(() => {
+    // No-op on web; on native, asks permission and registers the push token.
+    registerForPushNotifications();
+  }, []);
+
   return (
     <>
       <StatusBar style="dark" backgroundColor={colors.background} />
