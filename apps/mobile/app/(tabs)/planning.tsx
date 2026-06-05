@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { View, ScrollView, Text, StyleSheet } from 'react-native';
+import { View, ScrollView, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
 import { useRouter } from 'expo-router';
 import { useEventStore } from '@/store/eventStore';
@@ -16,6 +16,14 @@ LocaleConfig.locales['fr'] = {
   today: "Aujourd'hui",
 };
 LocaleConfig.defaultLocale = 'fr';
+
+const CATEGORY_ICON: Record<EventCategory, string> = {
+  CULTURE: '🎭',
+  SPORT: '🏅',
+  ANIMATION: '🎉',
+  COMMERCE: '🛍️',
+  AUTRE: '📌',
+};
 
 const CATEGORIES: { cat: EventCategory; label: string }[] = [
   { cat: 'CULTURE', label: 'Culture' },
@@ -41,58 +49,70 @@ export default function PlanningScreen() {
     fetchEvents();
   }, []);
 
-  // One colored dot per category present on each day (multi-dot marking).
-  const markedDates = useMemo(() => {
-    const dayCats: Record<string, Set<EventCategory>> = {};
+  // Map each day -> the distinct categories present that day (ordered as CATEGORIES).
+  const dayCategories = useMemo(() => {
+    const map: Record<string, Set<EventCategory>> = {};
     for (const e of events) {
       const k = dateKey(new Date(e.startDate));
-      (dayCats[k] ??= new Set()).add(e.category);
+      (map[k] ??= new Set()).add(e.category);
     }
-
-    const marks: Record<string, {
-      dots?: { key: string; color: string }[];
-      selected?: boolean;
-      selectedColor?: string;
-    }> = {};
-
-    for (const [day, cats] of Object.entries(dayCats)) {
-      marks[day] = {
-        dots: Array.from(cats).map((c) => ({ key: c, color: colors.category[c] })),
-      };
-    }
-
-    if (selectedDate) {
-      marks[selectedDate] = { ...marks[selectedDate], selected: true, selectedColor: colors.primary };
-    }
-    return marks;
-  }, [events, selectedDate]);
+    return map;
+  }, [events]);
 
   const dayEvents: Event[] = useMemo(() => {
     if (!selectedDate) return [];
     return events.filter((e) => dateKey(new Date(e.startDate)) === selectedDate);
   }, [events, selectedDate]);
 
-  // Open the calendar on the month of the earliest event (not an empty month).
   const initialMonth = useMemo(() => {
     if (events.length === 0) return undefined;
     const earliest = events.reduce((min, e) => (e.startDate < min ? e.startDate : min), events[0].startDate);
     return dateKey(new Date(earliest));
   }, [events]);
 
+  const renderDay = ({ date, state }: { date?: { dateString: string; day: number }; state?: string }) => {
+    if (!date) return <View style={styles.dayCell} />;
+    const cats = CATEGORIES.map((c) => c.cat).filter((c) => dayCategories[date.dateString]?.has(c));
+    const isSelected = date.dateString === selectedDate;
+    const isToday = state === 'today';
+    const disabled = state === 'disabled';
+
+    return (
+      <TouchableOpacity style={styles.dayCell} onPress={() => setSelectedDate(date.dateString)} disabled={disabled}>
+        <View style={[styles.dayNumWrap, isSelected && styles.daySelected]}>
+          <Text
+            style={[
+              styles.dayNum,
+              disabled && styles.dayDisabled,
+              isToday && !isSelected && styles.dayToday,
+              isSelected && styles.daySelectedText,
+            ]}
+          >
+            {date.day}
+          </Text>
+        </View>
+        <View style={styles.dayIcons}>
+          {cats.slice(0, 3).map((c) => (
+            <Text key={c} style={styles.dayIcon}>{CATEGORY_ICON[c]}</Text>
+          ))}
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
   return (
     <ScrollView style={styles.container}>
       <Calendar
         key={initialMonth ?? 'today'}
         current={initialMonth}
-        onDayPress={(day) => setSelectedDate(day.dateString)}
-        markedDates={markedDates}
-        markingType="multi-dot"
+        dayComponent={renderDay}
         firstDay={1}
         enableSwipeMonths
+        renderArrow={(direction) => (
+          <Text style={styles.arrow}>{direction === 'left' ? '‹' : '›'}</Text>
+        )}
         theme={{
-          todayTextColor: colors.primary,
           arrowColor: colors.primary,
-          selectedDayBackgroundColor: colors.primary,
           textMonthFontWeight: '700',
         }}
       />
@@ -101,7 +121,7 @@ export default function PlanningScreen() {
       <View style={styles.legend}>
         {CATEGORIES.map(({ cat, label }) => (
           <View key={cat} style={styles.legendItem}>
-            <View style={[styles.legendDot, { backgroundColor: colors.category[cat] }]} />
+            <Text style={styles.legendIcon}>{CATEGORY_ICON[cat]}</Text>
             <Text style={styles.legendLabel}>{label}</Text>
           </View>
         ))}
@@ -132,6 +152,52 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
+  arrow: {
+    fontSize: 28,
+    color: colors.primary,
+    fontWeight: '700',
+    paddingHorizontal: 14,
+  },
+  dayCell: {
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    minHeight: 46,
+    paddingTop: 2,
+  },
+  dayNumWrap: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  daySelected: {
+    backgroundColor: colors.primary,
+  },
+  dayNum: {
+    fontSize: 15,
+    color: colors.text,
+  },
+  daySelectedText: {
+    color: '#fff',
+    fontWeight: '700',
+  },
+  dayToday: {
+    color: colors.primary,
+    fontWeight: '700',
+  },
+  dayDisabled: {
+    color: colors.disabled,
+  },
+  dayIcons: {
+    flexDirection: 'row',
+    gap: 1,
+    marginTop: 1,
+    height: 14,
+  },
+  dayIcon: {
+    fontSize: 11,
+  },
   legend: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -147,12 +213,10 @@ const styles = StyleSheet.create({
   legendItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 4,
   },
-  legendDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
+  legendIcon: {
+    fontSize: 14,
   },
   legendLabel: {
     fontSize: 12,
