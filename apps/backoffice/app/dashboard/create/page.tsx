@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { eventApi } from '@/lib/api/client';
 import type { EventCategory, CreateEventInput } from '@/lib/types';
 import { ImageDropzone } from '@/components/ImageDropzone';
+import { DateTimeField } from '@/components/DateTimeField';
 import styles from './page.module.css';
 
 export default function CreateEventPage() {
@@ -27,17 +28,27 @@ export default function CreateEventPage() {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // Start drives the end: snap end onto start when it's empty or now earlier.
+  const setStart = (value: string) => {
     setFormData((prev) => {
-      if (name === 'startDate') {
-        // Keep the end on/after the start: snap it to the start whenever it's
-        // empty or would now be earlier (datetime-local strings compare safely).
-        const next = { ...prev, startDate: value };
-        if (!prev.endDate || prev.endDate < value) {
-          next.endDate = value;
-        }
-        return next;
+      const next = { ...prev, startDate: value };
+      if (!prev.endDate || (value && prev.endDate < value)) {
+        next.endDate = value;
       }
-      return { ...prev, [name]: value };
+      return next;
+    });
+  };
+
+  // End can never land before start.
+  const setEnd = (value: string) => {
+    setFormData((prev) => {
+      if (value && prev.startDate && value < prev.startDate) {
+        return { ...prev, endDate: prev.startDate };
+      }
+      return { ...prev, endDate: value };
     });
   };
 
@@ -141,39 +152,25 @@ export default function CreateEventPage() {
               </div>
             </div>
 
-            <div className={styles.grid}>
-              <div className={styles.field}>
-                <label htmlFor="startDate">Date & heure de début *</label>
-                <input
-                  id="startDate"
-                  name="startDate"
-                  type="datetime-local"
-                  step={300}
-                  value={formData.startDate}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
+            <div className={styles.field}>
+              <label htmlFor="startDate">Date & heure de début *</label>
+              <DateTimeField id="startDate" value={formData.startDate} onChange={setStart} />
+            </div>
 
-              <div className={styles.field}>
-                <label htmlFor="endDate">Date & heure de fin *</label>
-                <input
-                  id="endDate"
-                  name="endDate"
-                  type="datetime-local"
-                  step={300}
-                  min={formData.startDate || undefined}
-                  value={formData.endDate}
-                  onChange={handleChange}
-                  required
-                  disabled={!formData.startDate}
-                />
-                {!formData.startDate && (
-                  <small style={{ color: '#888', fontSize: 12 }}>
-                    Choisissez d&apos;abord la date de début
-                  </small>
-                )}
-              </div>
+            <div className={styles.field}>
+              <label htmlFor="endDate">Date & heure de fin *</label>
+              <DateTimeField
+                id="endDate"
+                value={formData.endDate}
+                onChange={setEnd}
+                min={formData.startDate || undefined}
+                disabled={!formData.startDate}
+              />
+              {!formData.startDate && (
+                <small style={{ color: '#888', fontSize: 12 }}>
+                  Choisissez d&apos;abord la date de début
+                </small>
+              )}
             </div>
 
             <div className={styles.field}>
