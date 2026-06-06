@@ -1,39 +1,25 @@
-# Dependencies
+# Same rules as .gitignore but WITHOUT google-services.json / GoogleService-Info.plist
+# so EAS Build receives the Firebase config files even though git doesn't track them.
+
 node_modules/
 /.pnp
 .pnp.js
-
-# Expo
 .expo/
 .expo-shared/
 dist/
-
-# Environment
 .env
 .env.local
 .env.*.local
-
-# Testing
 /coverage
 *.lcov
-
-# Development
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 .DS_Store
-
-# Build
 /build
 *.eas.json
-
-# Firebase config — client keys, safe to keep locally but flagged by GitHub scanning
-google-services.json
-GoogleService-Info.plist
-
-# Logs
 logs
 *.log
 npm-debug.log*
