@@ -23,6 +23,7 @@
     },
     "android": {
       "package": "com.shakkamagic.mavillleagenda",
+      "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#2d93c4"
