@@ -6,7 +6,8 @@
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "channel": "development"
     },
     "preview": {
       "distribution": "internal",
@@ -15,13 +16,15 @@
       },
       "env": {
         "EXPO_PUBLIC_API_URL": "https://ma-ville-agenda-api.vercel.app/api"
-      }
+      },
+      "channel": "preview"
     },
     "production": {
       "autoIncrement": true,
       "env": {
         "EXPO_PUBLIC_API_URL": "https://ma-ville-agenda-api.vercel.app/api"
-      }
+      },
+      "channel": "production"
     }
   },
   "submit": {

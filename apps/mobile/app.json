@@ -23,6 +23,9 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#2d93c4"
+      },
+      "runtimeVersion": {
+        "policy": "appVersion"
       }
     },
     "web": {},
@@ -37,6 +40,9 @@
         "projectId": "aa024a9a-79f4-4e31-8e76-24437b7b8739"
       }
     },
-    "owner": "shakkam"
+    "owner": "shakkam",
+    "updates": {
+      "url": "https://u.expo.dev/aa024a9a-79f4-4e31-8e76-24437b7b8739"
+    }
   }
 }

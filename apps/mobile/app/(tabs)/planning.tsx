@@ -17,14 +17,6 @@ LocaleConfig.locales['fr'] = {
 };
 LocaleConfig.defaultLocale = 'fr';
 
-const CATEGORY_ICON: Record<EventCategory, string> = {
-  CULTURE: '🎸',
-  SPORT: '🏅',
-  ANIMATION: '🎉',
-  COMMERCE: '🛍️',
-  AUTRE: '📌',
-};
-
 const CATEGORIES: { cat: EventCategory; label: string }[] = [
   { cat: 'CULTURE', label: 'Culture' },
   { cat: 'SPORT', label: 'Sport' },
@@ -70,20 +62,35 @@ export default function PlanningScreen() {
     return dateKey(new Date(earliest));
   }, [events]);
 
+  const todayKey = dateKey(new Date());
+
   const renderDay = ({ date, state }: { date?: { dateString: string; day: number }; state?: string }) => {
     if (!date) return <View style={styles.dayCell} />;
     const cats = CATEGORIES.map((c) => c.cat).filter((c) => dayCategories[date.dateString]?.has(c));
     const isSelected = date.dateString === selectedDate;
-    const isToday = state === 'today';
-    const disabled = state === 'disabled';
+    const isToday = date.dateString === todayKey;
+    const outOfMonth = state === 'disabled';
+    const isPast = date.dateString < todayKey;
+    const dimmed = outOfMonth || (isPast && !isToday);
+    const hasEvents = cats.length > 0;
 
     return (
-      <TouchableOpacity style={styles.dayCell} onPress={() => setSelectedDate(date.dateString)} disabled={disabled}>
-        <View style={[styles.dayNumWrap, isSelected && styles.daySelected]}>
+      <TouchableOpacity
+        style={[styles.dayCell, hasEvents && styles.dayCellEvent]}
+        onPress={() => setSelectedDate(date.dateString)}
+        disabled={outOfMonth}
+      >
+        <View
+          style={[
+            styles.dayNumWrap,
+            isToday && !isSelected && styles.dayTodayRing,
+            isSelected && styles.daySelected,
+          ]}
+        >
           <Text
             style={[
               styles.dayNum,
-              disabled && styles.dayDisabled,
+              dimmed && styles.dayDimmed,
               isToday && !isSelected && styles.dayToday,
               isSelected && styles.daySelectedText,
             ]}
@@ -91,9 +98,12 @@ export default function PlanningScreen() {
             {date.day}
           </Text>
         </View>
-        <View style={styles.dayIcons}>
-          {cats.slice(0, 3).map((c) => (
-            <Text key={c} style={styles.dayIcon}>{CATEGORY_ICON[c]}</Text>
+        <View style={styles.dayDots}>
+          {cats.slice(0, 4).map((c) => (
+            <View
+              key={c}
+              style={[styles.dot, { backgroundColor: colors.category[c] }, dimmed && styles.dotDim]}
+            />
           ))}
         </View>
       </TouchableOpacity>
@@ -121,7 +131,7 @@ export default function PlanningScreen() {
       <View style={styles.legend}>
         {CATEGORIES.map(({ cat, label }) => (
           <View key={cat} style={styles.legendItem}>
-            <Text style={styles.legendIcon}>{CATEGORY_ICON[cat]}</Text>
+            <View style={[styles.legendDot, { backgroundColor: colors.category[cat] }]} />
             <Text style={styles.legendLabel}>{label}</Text>
           </View>
         ))}
@@ -161,18 +171,28 @@ const styles = StyleSheet.create({
   dayCell: {
     alignItems: 'center',
     justifyContent: 'flex-start',
-    minHeight: 54,
-    paddingTop: 2,
+    minHeight: 50,
+    paddingTop: 3,
+    paddingBottom: 5,
+    marginVertical: 1,
+    borderRadius: 8,
+  },
+  dayCellEvent: {
+    backgroundColor: 'rgba(45,147,196,0.10)',
   },
   dayNumWrap: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
     alignItems: 'center',
     justifyContent: 'center',
   },
   daySelected: {
     backgroundColor: colors.primary,
+  },
+  dayTodayRing: {
+    borderWidth: 2,
+    borderColor: colors.primary,
   },
   dayNum: {
     fontSize: 15,
@@ -186,17 +206,23 @@ const styles = StyleSheet.create({
     color: colors.primary,
     fontWeight: '700',
   },
-  dayDisabled: {
+  dayDimmed: {
     color: colors.disabled,
   },
-  dayIcons: {
+  dayDots: {
     flexDirection: 'row',
-    gap: 2,
-    marginTop: 3,
-    height: 20,
+    gap: 3,
+    marginTop: 5,
+    height: 8,
+    alignItems: 'center',
   },
-  dayIcon: {
-    fontSize: 16,
+  dot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+  },
+  dotDim: {
+    opacity: 0.4,
   },
   legend: {
     flexDirection: 'row',
@@ -215,8 +241,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 4,
   },
-  legendIcon: {
-    fontSize: 14,
+  legendDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
   },
   legendLabel: {
     fontSize: 12,
