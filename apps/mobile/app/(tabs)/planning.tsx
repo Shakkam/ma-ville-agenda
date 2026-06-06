@@ -35,11 +35,20 @@ const dateKey = (d: Date): string => {
 export default function PlanningScreen() {
   const router = useRouter();
   const { events, fetchEvents } = useEventStore();
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const todayKey = dateKey(new Date());
+  const [selectedDate, setSelectedDate] = useState<string | null>(todayKey);
+  const [displayMonth, setDisplayMonth] = useState(todayKey);
+  const [calNonce, setCalNonce] = useState(0);
 
   useEffect(() => {
     fetchEvents();
   }, []);
+
+  const goToToday = () => {
+    setDisplayMonth(todayKey);
+    setSelectedDate(todayKey);
+    setCalNonce((n) => n + 1); // force the calendar back to today's month
+  };
 
   // Map each day -> the distinct categories present that day (ordered as CATEGORIES).
   const dayCategories = useMemo(() => {
@@ -55,14 +64,6 @@ export default function PlanningScreen() {
     if (!selectedDate) return [];
     return events.filter((e) => dateKey(new Date(e.startDate)) === selectedDate);
   }, [events, selectedDate]);
-
-  const initialMonth = useMemo(() => {
-    if (events.length === 0) return undefined;
-    const earliest = events.reduce((min, e) => (e.startDate < min ? e.startDate : min), events[0].startDate);
-    return dateKey(new Date(earliest));
-  }, [events]);
-
-  const todayKey = dateKey(new Date());
 
   const renderDay = ({ date, state }: { date?: { dateString: string; day: number }; state?: string }) => {
     if (!date) return <View style={styles.dayCell} />;
@@ -112,9 +113,15 @@ export default function PlanningScreen() {
 
   return (
     <ScrollView style={styles.container}>
+      <View style={styles.todayBar}>
+        <TouchableOpacity onPress={goToToday} style={styles.todayBtn}>
+          <Text style={styles.todayBtnText}>Aujourd&apos;hui</Text>
+        </TouchableOpacity>
+      </View>
+
       <Calendar
-        key={initialMonth ?? 'today'}
-        current={initialMonth}
+        key={`${displayMonth}-${calNonce}`}
+        current={displayMonth}
         dayComponent={renderDay}
         firstDay={1}
         enableSwipeMonths
@@ -167,6 +174,22 @@ const styles = StyleSheet.create({
     color: colors.primary,
     fontWeight: '700',
     paddingHorizontal: 14,
+  },
+  todayBar: {
+    alignItems: 'flex-end',
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.md,
+  },
+  todayBtn: {
+    backgroundColor: colors.primary,
+    paddingHorizontal: spacing.md,
+    paddingVertical: 6,
+    borderRadius: 16,
+  },
+  todayBtnText: {
+    color: '#fff',
+    fontSize: 13,
+    fontWeight: '600',
   },
   dayCell: {
     alignItems: 'center',
