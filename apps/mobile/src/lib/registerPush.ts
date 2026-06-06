@@ -2,11 +2,6 @@ import { Platform } from 'react-native';
 import Constants from 'expo-constants';
 import { pushApi } from '../api/client';
 
-// Registers this device's Expo push token with the API so residents get
-// notified when a new event is published.
-//
-// Native only: web push isn't supported here, and the heavy expo-notifications
-// module is dynamically imported so it's never evaluated in the web bundle.
 export async function registerForPushNotifications(): Promise<void> {
   if (Platform.OS === 'web') return;
 
@@ -14,15 +9,23 @@ export async function registerForPushNotifications(): Promise<void> {
     const Notifications = await import('expo-notifications');
     const Device = await import('expo-device');
 
-    // Physical device required (simulators don't get push tokens).
-    if (!Device.isDevice) return;
+    if (!Device.isDevice) {
+      console.log('[Push] Not a physical device — skipping');
+      return;
+    }
 
     const { status: existing } = await Notifications.getPermissionsAsync();
+    console.log('[Push] Permission status:', existing);
     let status = existing;
     if (existing !== 'granted') {
-      status = (await Notifications.requestPermissionsAsync()).status;
+      const { status: asked } = await Notifications.requestPermissionsAsync();
+      status = asked;
+      console.log('[Push] After request:', status);
     }
-    if (status !== 'granted') return;
+    if (status !== 'granted') {
+      console.warn('[Push] Permission denied — no push token registered');
+      return;
+    }
 
     if (Platform.OS === 'android') {
       await Notifications.setNotificationChannelAsync('default', {
@@ -32,13 +35,15 @@ export async function registerForPushNotifications(): Promise<void> {
     }
 
     const projectId = Constants.expoConfig?.extra?.eas?.projectId;
+    console.log('[Push] projectId:', projectId);
     const tokenResponse = await Notifications.getExpoPushTokenAsync(
       projectId ? { projectId } : undefined
     );
+    console.log('[Push] Token obtained:', tokenResponse.data);
 
     await pushApi.register(tokenResponse.data, Platform.OS);
+    console.log('[Push] Token registered with API ✓');
   } catch (e) {
-    // Never let notification setup crash the app.
-    console.warn('Push registration skipped/failed:', e);
+    console.warn('[Push] Registration failed:', e);
   }
 }

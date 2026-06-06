@@ -1,8 +1,15 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { prisma } from '../db/prisma.js';
+import { authMiddleware } from '../middleware/auth.js';
 
 export const pushRouter = Router();
+
+// GET /api/push/admin/tokens — debug: list registered tokens (auth required)
+pushRouter.get('/admin/tokens', authMiddleware, async (_req, res) => {
+  const tokens = await prisma.pushToken.findMany({ orderBy: { createdAt: 'desc' } });
+  res.json({ count: tokens.length, tokens });
+});
 
 const registerSchema = z.object({
   token: z.string().min(1),
