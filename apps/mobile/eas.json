@@ -19,6 +19,16 @@
       },
       "channel": "preview"
     },
+    "preview-ios": {
+      "autoIncrement": true,
+      "channel": "preview",
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://ma-ville-agenda-api.vercel.app/api"
+      },
+      "ios": {
+        "simulator": false
+      }
+    },
     "production": {
       "autoIncrement": true,
       "env": {
