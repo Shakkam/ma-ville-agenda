@@ -16,7 +16,10 @@
     ],
     "ios": {
       "supportsTabletMode": false,
-      "bundleIdentifier": "com.shakkamagic.mavillleagenda"
+      "bundleIdentifier": "com.shakkamagic.mavillleagenda",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "package": "com.shakkamagic.mavillleagenda",

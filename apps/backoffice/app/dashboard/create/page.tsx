@@ -27,7 +27,18 @@ export default function CreateEventPage() {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => {
+      if (name === 'startDate') {
+        // Keep the end on/after the start: snap it to the start whenever it's
+        // empty or would now be earlier (datetime-local strings compare safely).
+        const next = { ...prev, startDate: value };
+        if (!prev.endDate || prev.endDate < value) {
+          next.endDate = value;
+        }
+        return next;
+      }
+      return { ...prev, [name]: value };
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -137,6 +148,7 @@ export default function CreateEventPage() {
                   id="startDate"
                   name="startDate"
                   type="datetime-local"
+                  step={300}
                   value={formData.startDate}
                   onChange={handleChange}
                   required
@@ -149,10 +161,18 @@ export default function CreateEventPage() {
                   id="endDate"
                   name="endDate"
                   type="datetime-local"
+                  step={300}
+                  min={formData.startDate || undefined}
                   value={formData.endDate}
                   onChange={handleChange}
                   required
+                  disabled={!formData.startDate}
                 />
+                {!formData.startDate && (
+                  <small style={{ color: '#888', fontSize: 12 }}>
+                    Choisissez d&apos;abord la date de début
+                  </small>
+                )}
               </div>
             </div>
 
