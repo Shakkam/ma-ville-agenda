@@ -1,8 +1,11 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '@/styles/colors';
 
 export default function TabsLayout() {
+  const insets = useSafeAreaInsets();
+
   return (
     <Tabs
       screenOptions={{
@@ -16,8 +19,10 @@ export default function TabsLayout() {
           backgroundColor: colors.background,
           borderTopColor: colors.border,
           borderTopWidth: 1,
-          height: 64,
+          // Lift the bar above the Android system navigation (edge-to-edge).
+          height: 60 + insets.bottom,
           paddingTop: 6,
+          paddingBottom: insets.bottom > 0 ? insets.bottom : 8,
         },
         headerStyle: {
           backgroundColor: colors.primary,
